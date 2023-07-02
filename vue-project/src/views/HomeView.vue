@@ -4,13 +4,14 @@
     <!-- How to use ref. -->
     <h1 ref="appTitleRef">HomeView</h1>
 
+    <!-- Displaying text from the central store -->
     <h3>{{ counter.title }}</h3>
 
     <!-- Decrease buttons -->
     <button @click="counter.decreaseCounter(2)" class="btn">--</button>
     <button @click="counter.decreaseCounter(1)" class="btn">--</button>
 
-    <!-- Example how to use in html the count from Pinia store -->
+    <!-- We display the counter state here from Pinia store -->
     <span class="counter">{{ counter.count }}</span>
 
     <!-- Increase buttons -->
@@ -39,7 +40,6 @@ import { useCounterStore } from '@/stores/counter.js';
 
 //To access the Pinia store, we need to put it into a variable. This is it. 
 let counter = useCounterStore();
-
 
 //This is how we can acces a ref html element in Vue3. The variable name must be = to ref name! 
 const appTitleRef = ref(null);

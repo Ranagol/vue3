@@ -1,46 +1,32 @@
 <template>
     <div class="notes">
 
-        <!-- <AddEditNote>
+        <!-- VIEW FROM CREATING AND LISTING NOTES - PARENT 1 -->
+
+        <!-- CREATE NOTE COMPONENT -->
+        <AddEditNote
+            v-model="newNote"
+            ref="addEditNoteRef"
+            placeholder="Add a new note"
+            label="Create a new note"
+        >
+            
+            <!-- Notice the v-slot!!! -->
             <template v-slot:buttons>
+
+                <!-- We are sending this button to the child component through a named slot -->
                 <button 
                     @click="addNote"
                     :disabled="newNote === ''"
                     class="button is-link has-background-success"
                 >
-                    Add new note
+                    Create note
                 </button>
+
             </template>
-        </AddEditNote> -->
-
-        <div class="card has-background-success-dark p-4 mb-5">
-
-            <div class="field">
-                <div class="control">
-
-                    <textarea
-                        v-model="newNote"
-                        ref="newNoteRef"
-                        class="textarea"
-                        placeholder="Add a new note"
-                    />
-                </div>
-            </div>
-
-            <div class="field is-grouped is-grouped-right">
-                <div class="control">
-                    <button 
-                        @click="addNote"
-                        :disabled="newNote === ''"
-                        class="button is-link has-background-success"
-                    >
-                        Add new note
-                    </button>
-                </div>
-            </div>
-        </div>
+        </AddEditNote>
         
-        <!-- DISPLAYING ALL EXISTING NOTES -->
+        <!-- LOOPING OUT ALL EXISTING NOTES -->
         <Note
             v-for="note in storeNotes.notes"
             :key="note.id"
@@ -56,8 +42,7 @@ import { useStoreNotes } from '@/stores/storeNotes.js';
 import Note from '@/components/Notes/Note.vue';
 import AddEditNote from '../components/Notes/AddEditNote.vue';
 
-const newNoteRef = ref(null);
-const newNote = ref('');//When we use this variable, in script, we always must use .value
+const newNote = ref('');//When we use this variable, in script, we always must use newNote.value
 
 /**
  * These are the notes from the storeNotes Pinia store. We access the notes from Pinia like this:
@@ -66,6 +51,8 @@ const newNote = ref('');//When we use this variable, in script, we always must u
  * notes: this is the name of the variable, that actually has the note objects
  */
 const storeNotes = useStoreNotes();
+
+const addEditNoteRef = ref(null);
 
 function addNote(){
 
@@ -78,12 +65,11 @@ function addNote(){
     newNote.value = '';
 
     /**
-     * 
-     * When all this is done, we want our cursor to appear in the textarea with ref="newNoteRef".
-     * Now for all this to work, first we had to create a reactive newNoteRef const, with false. 
-     * Later this will contain the...
+     * The focusTextarea() is defined in the child AddEditNote.vue component. We target this 
+     * component with the help of a ref.
      */
-    newNoteRef.value.focus();
+    addEditNoteRef.value.focusTextarea();
+
 }
 
 

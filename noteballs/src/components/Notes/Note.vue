@@ -1,5 +1,6 @@
 <template>
     
+    <!-- ONE SINGLE NOTE DISPLAYING -->
     <div
         class="card mb-4"
     >

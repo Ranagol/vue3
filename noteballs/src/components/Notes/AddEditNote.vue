@@ -23,16 +23,18 @@
         <div class="field">
             <div class="control">
 
-                <!-- Notice that this here is a div like something, not na input field. So, we
-                will need html ref to get the text from html to Vue.-->
-                <textarea
-                    ref="textareaRef"
-                    class="textarea"
-                    :placeholder="props.placeholder"
-                    v-model="modelValue" 
-                    @input="change"
-                />
-                
+            <!-- Notice that this here is a div like something, not na input field. So, we
+            will need html ref to get the text from html to Vue.-->
+            <textarea
+                ref="textareaRef"
+                class="textarea"
+                :placeholder="props.placeholder"
+                v-model="modelValue" 
+                @input="change"
+                v-autofocus
+            />
+            <!-- v-autofocus: this is my custom directive -->
+
             </div>
         </div>
 
@@ -50,6 +52,8 @@
 <script setup>
 
 import { ref } from 'vue'; 
+
+
 /**
  * Props
  */
@@ -82,7 +86,6 @@ function change(){
     emit('update:modelValue', props.modelValue);
 }
 
-
 const textareaRef = ref(null);
 
 /**
@@ -104,5 +107,18 @@ defineExpose({//2 - exposing the function so it is accessable by the ViewNotes c
     focusTextarea
 });
 
+/**
+ * Below we make a custom directive in Vue3. When we open http://127.0.0.1:5173/#/, we want
+ * an automatic focus to place the cursor into the 'Create new note' textarea.
+ * 
+ * The constant name must start with 'v'.
+ * 
+ * The function will take the html element (where this directive is) as argument
+ */
+const vAutofocus = {
+    mounted: (element) => {
+        element.focus();
+    }
+}
 
 </script>

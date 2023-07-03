@@ -35,6 +35,7 @@
               to="/"
               class="navbar-item"
               active-class="is-active"
+              @click="showMobileNav = false"
             >
               Notes
             </RouterLink>
@@ -43,6 +44,7 @@
               to="/stats"
               class="navbar-item"
               active-class="is-active"
+              @click="showMobileNav = false"
             >
               Stats
             </RouterLink>
@@ -53,20 +55,22 @@
     </nav>
   </template>
   
-  <script setup>
-    import { ref } from 'vue';
-    const showMobileNav = ref(false);
+<script setup>
+import { ref } from 'vue';
 
-  </script>
-  
+//determines...
+const showMobileNav = ref(false);
+
+</script>
 
 
-  <style>
-  @media (max-width: 1023px) {
-    .navbar-menu {
-      position: absolute;
-      left: 0;
-      width: 100%;
-    }
+
+<style>
+@media (max-width: 1023px) {
+  .navbar-menu {
+    position: absolute;
+    left: 0;
+    width: 100%;
   }
-  </style>
+}
+</style>

@@ -37,10 +37,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useStoreNotes } from '@/stores/storeNotes.js';
 import Note from '@/components/Notes/Note.vue';
 import AddEditNote from '../components/Notes/AddEditNote.vue';
+import { useWatchCharacters } from '@/use/useWatchCharacters.js';//here we import our composable
 
 const newNote = ref('');//When we use this variable, in script, we always must use newNote.value
 
@@ -73,11 +74,11 @@ function addNote(){
 }
 
 
-
-
-
-
-
+/**
+ * Here we trigger our composable, we trigger the composable function, and we give it the newNote
+ * as an argument, so it would watch this variable.
+ */
+useWatchCharacters(newNote);
 
 
 

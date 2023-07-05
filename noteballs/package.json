@@ -7,7 +7,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vueuse/core": "^10.2.1",
     "bulma": "^0.9.4",
+    "firebase": "^9.23.0",
     "pinia": "^2.0.23",
     "vue": "^3.2.41",
     "vue-router": "^4.1.6"

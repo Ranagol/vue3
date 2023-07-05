@@ -11,10 +11,16 @@
 
 <script setup>
 import NavBar from "@/components/Layout/NavBar.vue";
-import { onMounted } from 'vue';
+import { useStoreNotes } from '@/stores/storeNotes.js';
+import { onMounted } from "vue";
 
+const storeNotes = useStoreNotes();
+
+/**
+ * This is a hook for getting all tne notes from Firestorm into our storage. 
+ */
 onMounted(() => {
-  console.log('onMounted from App.vue');
+  storeNotes.getNotes();
 });
 
 </script>

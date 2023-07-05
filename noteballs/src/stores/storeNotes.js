@@ -1,4 +1,18 @@
 import { defineStore } from 'pinia';
+import { collection, getDoc, doc, setDoc, onSnapshot, deleteDoc, updateDoc, query, orderBy, addDoc} from 'firebase/firestore';
+import { db } from '@/js/firebase.js';//importing the Firestore db into our storage
+
+/**
+ * collection in Firebase = table in sql
+ * document in Firebase = record in sql
+ * This is our notes collection.
+ */
+const notesCollectionRef = collection(db, 'notes');
+
+/**
+ * This is a query.
+ */
+const notesCollectionQuery = query(notesCollectionRef, orderBy("date", "desc"));
 
 export const useStoreNotes = defineStore(
     // 1. argument: the name of the store
@@ -11,16 +25,8 @@ export const useStoreNotes = defineStore(
          */
         state: () => {
             return { 
-                notes: [
-                    {
-                        id: 'id1',
-                        content: 'lorem ipsum 1'
-                    },
-                    {
-                        id: 'id2',
-                        content: 'lorem ipsum 2'
-                    }
-                ],
+                //We store here the notes from Firestorm
+                notes: [],
             }
         },
 
@@ -30,41 +36,96 @@ export const useStoreNotes = defineStore(
          */ 
         actions: {
 
-            addNote(newContent) {
+            /**
+             * Gets notes from Firestorm db
+             * collection in Firebase = table in sql
+             * document in Firebase = record in sql
+             * Since we must AWAIT for Firestrom response, we also must use 'await'.
+             */
+            async getNotes(){
 
-                //The new note...
-                let note = {
+                /**
+                 * This below will grab all notes from Firestrom, but it will also keep listenin
+                 * for changes in notes, and trigger/sync when there is a change - automatically.
+                 * 
+                 * onSnapshot is a hook, belonging to Firestore. Every hook always must be also
+                 * turned off at the end of the cycle.
+                 * 
+                 * onSnapshot watches always...
+                 */
+                onSnapshot(notesCollectionQuery, (querySnapshot) => {
+                    let notes = [];
+                    querySnapshot.forEach((doc) => {
+                        
+                        //We create a note object, that will be stored in the storage
+                        let note = {
+                            id: doc.id,
+                            content: doc.data().content,
+                            date: doc.data().date
+                        }
+
+                        //Pushing the note into the notes array
+                        notes.push(note);
+                    });
+
+                    //Simulating 2 s waiting time
+                    setTimeout(() => {
+                        //Here we replace the old notes with the new, updated notes
+                        this.notes = notes;
+                    });
+
                     
-                    //To access another action in Pinia store, we must use 'this.'
-                    id: this.createUniqueId(),
-                    content: newContent
-                };
+                });
+            },
+
+            /**
+             * Adds note to Firestorm.
+             * collection in Firebase = table in sql
+             * document in Firebase = record in sql
+             */
+            async addNote(newContent) {
+
+                /**
+                 * Here we create a date string
+                 */
+                let currentDate = new Date().getTime();//returns integer, but we need a string as id
+                let date = currentDate.toString();//so we do toString here
+
                 
                 /**
-                 * Adding the new note to all notes
-                 * To acces a variable from the Pinia store, must use 'this.'
+                 * Adding the new note to all notes in Firestore.
+                 * Add a new document in collection "notes" in Firestore db
+                 * 
+                 * Once we added this note to Firestorm, the onSnapshot will trigger, and the
+                 * new note will appear in our browser.
                  */
-                this.notes.unshift(note);
+                const docRef = await addDoc(notesCollectionRef, {
+                    content: newContent,
+                    date//meaning... date:date
+                });
+            },
+
+            /**
+             * Updates note in Firestorm.
+             */
+            async updateNote(id, content){
+
+                // Set the "capital" field of the city 'DC'
+                await updateDoc(doc(notesCollectionRef, id), {
+                    content//this is = to content:content
+                });
+            },
+            
+            /**
+             * Deletes note from Firestorm.
+             * Once we deleteda note in Firestorm, the onSnapshot will trigger, and the change will
+             * in our browser.
+             */
+            async deleteNote(idToDelete){
+                await deleteDoc(doc(notesCollectionRef, idToDelete));
+            },
+
                 
-            },
-            
-            createUniqueId(){
-                let currentDate = new Date().getTime();//returns integer, but we need a string as id
-                let id = currentDate.toString();//so we do toString here
-                return id;
-            },
-
-            updateNote(id, content){
-                //get the index of the note that we want to update
-                let index = this.notes.findIndex(note => note.id === id)
-                //we use the index to find our note, and update it ot the new content
-                this.notes[index].content = content;
-
-            },
-            
-            deleteNote(noteToDelete){
-                this.notes = this.notes.filter( note => note.id !== noteToDelete.id );
-            }
         },
 
         /**

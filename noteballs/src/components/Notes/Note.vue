@@ -12,8 +12,9 @@
             </div>
 
             <!-- NOTE LENGTH -->
-            <div class="has-text-right has-text-grey-light mt-2">
-                <small>{{ numberOfCharacters }} characters</small>
+            <div class="columns is-mobile  has-text-grey-light mt-2">
+                <small class="column">{{ dateFormatted }}</small>
+                <small class="column has-text-right">{{ numberOfCharacters }} characters</small>
             </div>
 
         </div>
@@ -29,27 +30,39 @@
             </RouterLink>
 
             <a
-              @click.prevent="deleteNote"
-              class="card-footer-item"
+                @click.prevent="modals.deleteNote = true"
+                class="card-footer-item"
             >
                 Delete
             </a>
+
+
         </footer>
+
+        <!-- This modal below is the 'Are you sure that you want to delete...? Type modal. -->
+        <ModalDeleteNote
+            v-if="modals.deleteNote"
+            v-model="modals.deleteNote"
+            :noteId="note.id"
+        ></ModalDeleteNote>
+
     </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { reactive, computed } from 'vue';
 import { useStoreNotes } from '@/stores/storeNotes.js';
+import ModalDeleteNote from '@/components/Notes/ModalDeleteNote.vue';
+import { useNow, useDateFormat } from '@vueuse/core';
+
 const storeNotes = useStoreNotes();
 
 //defineProps does not need to be imported. Just simply use it.
 let props = defineProps(
     {
-        //We are sending a props title from the parent component
         note: {
             type: Object,
-            default: () => {}
+            required: true
         }
     }
 );
@@ -66,6 +79,25 @@ let numberOfCharacters = computed(() => {
 function deleteNote(){
     storeNotes.deleteNote(props.note);
 }
+
+
+// MODAL FOR DELETING a note (Are you sure that you want to delete?)
+const modals = reactive({
+    //when we want to delete a note, than it is true, because we need the modal displayed for that
+    deleteNote: false,
+})
+
+
+/**
+ * COMPUTED FOR FORMATING DATE, USING VUEUSE DATEFORMAT
+ * What we have in our note object is a timestamp string. So, from this we have to make a proper
+ * date object.
+ */
+const dateFormatted = computed(() => {
+    let date = new Date(parseInt(props.note.date));//timestamp string to int, int to date object transformation
+    return useDateFormat(date,'YYYY-MM-DD HH:mm:ss').value;
+
+})
 
 
 </script>
